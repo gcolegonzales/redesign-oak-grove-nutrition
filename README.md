@@ -27,6 +27,20 @@ Fully static — `index.html` + `styles.css` + `script.js`. One Google Fonts lin
 no framework. Responsive (360px → widescreen), accessible (semantic landmarks, labels, focus states,
 `prefers-reduced-motion`), and animated (sticky header, scroll reveal, playful hero).
 
+## SEO
+On-page SEO is retrofitted without touching the visible design or content:
+- **JSON-LD structured data** (`@type: FoodEstablishment`) in `<head>` with real name, telephone,
+  address, `openingHoursSpecification`, `image`, `url`, `areaServed`, and `sameAs` (Facebook/Instagram).
+- **Canonical** link + complete **Open Graph** and **Twitter Card** tags.
+- **`robots.txt`** (allow-all + `Sitemap:`) and **`sitemap.xml`** at repo root.
+- Single `<h1>`, real `<h2>`/`<h3>` headings.
+
+**Base URL placeholder:** the final domain is unknown, so every canonical / `og:url` / schema `url` /
+`image` / sitemap / robots URL uses the literal placeholder `https://REPLACE-WITH-DOMAIN.com/`.
+At deploy, do one find-replace of `REPLACE-WITH-DOMAIN.com` across `index.html`, `robots.txt`, and
+`sitemap.xml` with the real domain (and drop a real social share image at the referenced
+`assets/photos/` path).
+
 ## View it
 Open `index.html` in any browser. No server needed.
 
