@@ -196,7 +196,7 @@ a { color: inherit; }
 .section-sub { color: var(--ink-soft); font-size: 1.08rem; margin-top: .8rem; font-weight: 600; }
 
 /* ---------- Menu ---------- */
-.menu { background: linear-gradient(180deg, var(--cream), var(--wash)); }
+.menu { background: linear-gradient(180deg, var(--wash), #ffe6f2); }
 .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
 .menu-card {
   position: relative; background: var(--paper); border-radius: var(--radius);
