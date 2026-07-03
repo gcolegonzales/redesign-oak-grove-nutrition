@@ -393,8 +393,29 @@ a { color: inherit; }
 }
 .nav-scrim.open { opacity: 1; visibility: visible; pointer-events: auto; }
 
+/* In-drawer close (X). Hidden on desktop (inline nav); shown inside the
+   mobile drawer, where it is always the top-most, always-tappable control. */
+.nav-close { display: none; }
+
 @media (max-width: 720px) {
   .nav-toggle { display: flex; }
+
+  /* Always-tappable close (X) pinned top-right inside the drawer panel */
+  .nav-close {
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 1rem; right: 1.1rem;
+    width: 44px; height: 44px; padding: 0;
+    background: none; border: none; cursor: pointer;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .nav-close:hover, .nav-close:focus-visible { background: rgba(209,103,63,.12); }
+  .nav-close span {
+    position: absolute; width: 26px; height: 3px;
+    background: var(--ink); border-radius: 2px;
+  }
+  .nav-close span:nth-child(1) { transform: rotate(45deg); }
+  .nav-close span:nth-child(2) { transform: rotate(-45deg); }
 
   /* The <ul> becomes a full-height side drawer */
   .nav-list {

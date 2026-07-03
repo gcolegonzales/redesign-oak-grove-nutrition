@@ -24,6 +24,18 @@
     scrim.className = "nav-scrim";
     document.body.appendChild(scrim);
 
+    // Always-tappable close control INSIDE the drawer panel. Because the panel
+    // is the top-most paint layer on mobile, a button within it can never be
+    // covered by the panel itself (unlike the header toggle, whose z-index is
+    // trapped in the header's stacking context). This guarantees touch users
+    // can dismiss the drawer even when the header hamburger is occluded.
+    var drawerClose = document.createElement("button");
+    drawerClose.type = "button";
+    drawerClose.className = "nav-close";
+    drawerClose.setAttribute("aria-label", "Close menu");
+    drawerClose.innerHTML = '<span></span><span></span>';
+    navList.insertBefore(drawerClose, navList.firstChild);
+
     var mq = window.matchMedia("(max-width: 720px)");
     var placeNav = function () {
       if (mq.matches) {
@@ -59,6 +71,10 @@
         if (on) a.removeAttribute("tabindex");
         else a.setAttribute("tabindex", "-1");
       });
+      // The in-drawer close button is off-canvas when closed on mobile — keep
+      // it out of the tab order until the drawer is open.
+      if (on) drawerClose.removeAttribute("tabindex");
+      else drawerClose.setAttribute("tabindex", "-1");
     };
 
     var getFocusable = function () {
@@ -119,6 +135,7 @@
       setOpen(!navList.classList.contains("open"));
     });
     scrim.addEventListener("click", closeNav);
+    drawerClose.addEventListener("click", closeNav);
     navList.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", closeNav);
     });
