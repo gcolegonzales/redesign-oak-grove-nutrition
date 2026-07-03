@@ -36,14 +36,84 @@
     if (mq.addEventListener) mq.addEventListener("change", placeNav);
     else if (mq.addListener) mq.addListener(placeNav);
 
+    // Elements outside the drawer that should be inert while it's open.
+    var mainEl = document.getElementById("main");
+    var footerEl = document.querySelector(".site-footer");
+    var outside = [mainEl, footerEl].filter(Boolean);
+
+    var setInert = function (on) {
+      outside.forEach(function (el) {
+        if (on) {
+          el.setAttribute("inert", "");
+          el.setAttribute("aria-hidden", "true");
+        } else {
+          el.removeAttribute("inert");
+          el.removeAttribute("aria-hidden");
+        }
+      });
+    };
+
+    // Keep off-canvas drawer links out of the tab order when closed.
+    var setLinksFocusable = function (on) {
+      navList.querySelectorAll("a").forEach(function (a) {
+        if (on) a.removeAttribute("tabindex");
+        else a.setAttribute("tabindex", "-1");
+      });
+    };
+
+    var getFocusable = function () {
+      return Array.prototype.slice.call(
+        navList.querySelectorAll('a[href], button:not([disabled])')
+      ).filter(function (el) { return el.offsetParent !== null || el === document.activeElement; });
+    };
+
+    var onKeydown = function (e) {
+      if (!navList.classList.contains("open")) return;
+      if (e.key === "Escape") { closeNav(); return; }
+      if (e.key !== "Tab") return;
+      var f = getFocusable();
+      if (!f.length) { e.preventDefault(); return; }
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    };
+
     var setOpen = function (open) {
+      var wasOpen = navList.classList.contains("open");
       navList.classList.toggle("open", open);
       scrim.classList.toggle("open", open);
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      document.documentElement.style.overflow = open ? "hidden" : "";
       document.body.style.overflow = open ? "hidden" : "";
+
+      if (open) {
+        setLinksFocusable(true);
+        setInert(true);
+        var f = getFocusable();
+        if (f.length) f[0].focus();
+      } else {
+        setInert(false);
+        setLinksFocusable(false);
+        if (wasOpen) toggle.focus();
+      }
     };
     var closeNav = function () { setOpen(false); };
+
+    // Drawer links are off-canvas when closed on mobile — keep them untabbable.
+    var syncDrawerState = function () {
+      if (mq.matches) {
+        if (!navList.classList.contains("open")) setLinksFocusable(false);
+      } else {
+        // Desktop: nav is an inline list — always tabbable, never inert.
+        setLinksFocusable(true);
+        setInert(false);
+      }
+    };
+    syncDrawerState();
 
     toggle.addEventListener("click", function () {
       setOpen(!navList.classList.contains("open"));
@@ -52,13 +122,12 @@
     navList.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", closeNav);
     });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && navList.classList.contains("open")) closeNav();
-    });
+    document.addEventListener("keydown", onKeydown);
     // Reset + relocate on resize
     window.addEventListener("resize", function () {
       if (window.innerWidth > 720 && navList.classList.contains("open")) closeNav();
       placeNav();
+      syncDrawerState();
     });
   }
 
